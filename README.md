@@ -2,7 +2,7 @@
 
 https://freecurrencyapi.com  don't have free access to historical exchange rates data api.
 
-Hence I am using api from (https://currencybeacon.com/)[https://currencybeacon.com/] .
+Hence I am using api from https://currencybeacon.com/ .
 
 
 * Goto https://currencybeacon.com/register page and Register with basic details.
