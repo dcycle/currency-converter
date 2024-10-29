@@ -31,15 +31,21 @@ Using format_data method we are extracting response.
 ** Run exchange rates functionaitlity as below :-
 
 ```
-./scripts/fetch-currency-conversion-rates.sh <api_key> "https://api.currencybeacon.com/v1" source destinations from_date end_date
+./scripts/fetch-currency-conversion-rates.sh <api_key> "https://api.currencybeacon.com/v1" source destinations from_date end_date [app/output_file]
 ```
 
 ```
-./scripts/fetch-currency-conversion-rates.sh  <your_api_key>   "https://api.currencybeacon.com/v1" USD EUR,GBP 2023-01-01 2023-01-31
+./scripts/fetch-currency-conversion-rates.sh  <your_api_key>   "https://api.currencybeacon.com/v1" USD EUR,GBP 2023-01-01 2023-01-31 
 ```
 
 ```
-./scripts/fetch-currency-conversion-rates.sh  <your_api_key>   "https://api.currencybeacon.com/v1" USD HTG 2023-01-01 2023-01-31
+./scripts/fetch-currency-conversion-rates.sh  <your_api_key>   "https://api.currencybeacon.com/v1" USD HTG 2023-01-01 2023-01-31 
+```
+
+If you want to write output to file: 
+```
+apiKey=<your_api_key>
+./scripts/fetch-currency-conversion-rates.sh $apiKey "https://api.currencybeacon.com/v1" USD HTG 2023-01-01 2023-01-31 ./app/unversioned/result.json
 ```
 
 ** RUN tests

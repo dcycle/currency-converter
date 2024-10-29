@@ -1,13 +1,14 @@
 """
 fetch_currency_conversion_rates.py
 
-A script to fetch data from fetch_currency_conversion_rates.py.
+A script to fetch data from fetch_currency_conversion_rates.py and
+store it in json file if provided.
 
 You have set environment variable API_KEY, API_ENDPOINT before executing code.
 
 Usage:
     python fetch_currency_conversion_rates.py
-      <base> <symbols> <start_date> <end_date> <api_key> <api_endpoint>
+      <base> <symbols> <start_date> <end_date> <api_key> <api_endpoint> [<output_file>]
 
 Arguments:
     base (str): Source Currency Code.
@@ -16,9 +17,11 @@ Arguments:
     to_dend_dateate (Date): To Date.
     api_key(str): Authorized Api key.
     api_endpoint(str): Currency Exchange provider api.
+    output_file (str): The path to the output JSON file.
 """
 import os
 import sys
+import json
 from datetime import datetime
 import argparse
 # pylint: disable=E0401
@@ -42,6 +45,28 @@ class ServiceUnavailableError(Exception):
 
 class UnexpectedError(Exception):
     """Exception raised for unexpected errors."""
+
+def save_data_to_json(data, output_file):
+    """
+    Saves the provided data to a specified JSON file.
+
+    Parameters:
+    - data (list): The data to be saved, typically a list of dictionaries.
+    - output_file (str): The path to the output JSON file.
+
+    Raises:
+    - IOError: If there is an issue writing to the file.
+    """
+    output_dir = os.path.dirname(output_file)
+    if output_dir and not os.path.exists(output_dir):
+        print(f"Directory does not exist. Creating: {output_dir}")
+        os.makedirs(output_dir)
+
+    # Save the data to the specified JSON file with UTF-8 encoding
+    with open(output_file, 'w', encoding='utf-8') as f:
+        json.dump(data, f, indent=4)
+
+    print(f"Data saved to {output_file}")
 
 # Function to make the API request
 def fetch_timeseries(base, symbols, start_date, end_date):
@@ -170,6 +195,7 @@ def main():
       'end_date',
       help="End date for the timeseries in YYYY-MM-DD format (e.g., 2023-01-31)"
     )
+    parser.add_argument('output_file', nargs='?', help="Output JSON file path (optional)")
 
     args = parser.parse_args()
 
@@ -191,7 +217,11 @@ def main():
     try:
         symbols_list = args.symbols.split(',')
         data = fetch_timeseries(args.base, symbols_list, args.start_date, args.end_date)
-        print(data)
+        if args.output_file:
+            print(f"Attempting to save data to {args.output_file}")
+            save_data_to_json(data, args.output_file)
+        else:
+            print(data)
     except ValueError as ve:
         print("Value Error: " + str(ve))
     except KeyError as ke:
