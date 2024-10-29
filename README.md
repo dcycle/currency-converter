@@ -42,7 +42,7 @@ Using format_data method we are extracting response.
 ./scripts/fetch-currency-conversion-rates.sh  <your_api_key>   "https://api.currencybeacon.com/v1" USD HTG 2023-01-01 2023-01-31 
 ```
 
-If you want to write output to file: 
+If you want to write output to a json file: 
 ```
 apiKey=<your_api_key>
 ./scripts/fetch-currency-conversion-rates.sh $apiKey "https://api.currencybeacon.com/v1" USD HTG 2023-01-01 2023-01-31 ./app/unversioned/result.json
