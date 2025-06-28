@@ -71,6 +71,7 @@ class TestCurrencyConversionRatesCsv(unittest.TestCase):
       side_effect=ValueError("Invalid API response")
     )
     @patch('fetch_currency_conversion_rates_csv.parse_and_validate_args')
+    # pylint: disable=W0613
     def test_main_value_error(self, mock_parse_args, mock_fetch):
         """
         Test that the main function raises a ValueError if invalid data is provided.

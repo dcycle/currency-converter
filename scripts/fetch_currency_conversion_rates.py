@@ -214,6 +214,7 @@ def main():
     The main function that parses command-line arguments, validates them, and fetches
     the currency exchange rates from the CurrencyBeacon API.
     """
+    # pylint: disable=R0801
     args = parse_and_validate_args()
     # Fetch data from CurrencyBeacon API
     try:
@@ -222,6 +223,7 @@ def main():
         if args.output_file:
             print(f"Attempting to save data to {args.output_file}")
             save_data_to_json(data, args.output_file)
+    # pylint: disable=R0801
         else:
             print(data)
     except ValueError as ve:
@@ -235,5 +237,6 @@ def main():
     except Exception as e:  # This can still be used to catch unexpected errors
         print("Unexpected Error: " + str(e))
 
+# pylint: disable=R0801
 if __name__ == "__main__":
     main()
