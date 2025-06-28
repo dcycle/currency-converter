@@ -52,3 +52,29 @@ apiKey=<your_api_key>
 ```
 % ./scripts/test_fetch_currency_conversion_rates.sh
 ```
+
+Generate currency conversion rates json and csv file.
+-----
+
+```
+./scripts/fetch-currency-conversion-rates-csv.sh <api_key> "https://api.currencybeacon.com/v1" source destinations from_date end_date [app/output_file]
+```
+
+example:-
+
+```
+apiKey=<your_api_key>
+./scripts/fetch-currency-conversion-rates-csv.sh $apiKey "https://api.currencybeacon.com/v1" USD HTG 2023-01-01 2023-01-31 ./app/unversioned/result
+```
+
+Now you will see currency conversion rates output files at ./app/unversioned/result.json and ./app/unversioned/result.csv respectively.
+
+** RUN tests
+```
+% ./scripts/test_fetch_currency_conversion_rates_csv.sh
+```
+
+note:- Mention file name without extension and path as a outputfile, In script while generating json and csv file we appending .json and .csv extension to files respectively.
+
+example:- ./app/unversioned/result
+

@@ -27,7 +27,6 @@ import argparse
 # pylint: disable=E0401
 import requests
 
-
 class APILimitExceededError(Exception):
     """Exception raised when the API limit is exceeded."""
 
@@ -143,6 +142,38 @@ def format_data(base, response):
     # print(formatted_data)
     return formatted_data
 
+def parse_and_validate_args():
+    """
+    Parse and validate command-line arguments for currency conversion rate fetching.
+
+    Returns:
+        argparse.Namespace: Parsed and validated arguments including base currency,
+                            target symbols, start and end dates, and optional output file.
+
+    Exits:
+        The program will exit with an error message if any validation fails.
+    """
+    parser = argparse.ArgumentParser(description="Fetch historical currency exchange rates")
+    parser.add_argument('base', help="The base currency for the rates (e.g., USD)")
+    parser.add_argument('symbols', help="Comma-separated list of target currencies (e.g., EUR,GBP)")
+    parser.add_argument('start_date', help="Start date (YYYY-MM-DD)")
+    parser.add_argument('end_date', help="End date (YYYY-MM-DD)")
+    parser.add_argument('output_file', nargs='?', help="Output file path (optional)")
+
+    args = parser.parse_args()
+
+    if not validate_date(args.start_date):
+        print(f"Error: Invalid start date format: {args.start_date}. Expected format: YYYY-MM-DD.")
+        sys.exit(1)
+    if not validate_date(args.end_date):
+        print(f"Error: Invalid end date format: {args.end_date}. Expected format: YYYY-MM-DD.")
+        sys.exit(1)
+    if not validate_symbols(args.symbols):
+        print(f"Error: Invalid currency symbols: {args.symbols}")
+        sys.exit(1)
+
+    return args
+
 # Function to validate date format (YYYY-MM-DD)
 def validate_date(date_str):
     """
@@ -183,36 +214,8 @@ def main():
     The main function that parses command-line arguments, validates them, and fetches
     the currency exchange rates from the CurrencyBeacon API.
     """
-    # Parse command-line arguments
-    parser = argparse.ArgumentParser(description="Fetch historical currency exchange rates")
-    parser.add_argument('base', help="The base currency for the rates (e.g., USD)")
-    parser.add_argument('symbols', help="Comma-separated list of target currencies (e.g., EUR,GBP)")
-    parser.add_argument(
-      'start_date',
-      help="Start date for the timeseries in YYYY-MM-DD format (e.g., 2023-01-01)"
-    )
-    parser.add_argument(
-      'end_date',
-      help="End date for the timeseries in YYYY-MM-DD format (e.g., 2023-01-31)"
-    )
-    parser.add_argument('output_file', nargs='?', help="Output JSON file path (optional)")
-
-    args = parser.parse_args()
-
-    # Validate arguments
-    if not validate_date(args.start_date):
-        print(f"Error: Invalid start date format: {args.start_date}. Expected format: YYYY-MM-DD.")
-        sys.exit(1)
-
-    if not validate_date(args.end_date):
-        print(f"Error: Invalid end date format: {args.end_date}. Expected format: YYYY-MM-DD.")
-        sys.exit(1)
-
-    if not validate_symbols(args.symbols):
-        print("Error: Invalid currency symbols: " + args.symbols)
-        print("Each symbol must be a 3-letter code separated by commas (e.g., EUR,GBP).")
-        sys.exit(1)
-
+    # pylint: disable=R0801
+    args = parse_and_validate_args()
     # Fetch data from CurrencyBeacon API
     try:
         symbols_list = args.symbols.split(',')
@@ -220,6 +223,7 @@ def main():
         if args.output_file:
             print(f"Attempting to save data to {args.output_file}")
             save_data_to_json(data, args.output_file)
+    # pylint: disable=R0801
         else:
             print(data)
     except ValueError as ve:
@@ -233,5 +237,6 @@ def main():
     except Exception as e:  # This can still be used to catch unexpected errors
         print("Unexpected Error: " + str(e))
 
+# pylint: disable=R0801
 if __name__ == "__main__":
     main()
