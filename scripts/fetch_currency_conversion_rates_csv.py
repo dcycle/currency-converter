@@ -26,14 +26,15 @@ For example:-
       USD HTG,XOF,CAD,EUR 2025-03-01 2025-05-31 ./app/unversioned/result
 """
 import os
-import sys
 import csv
 from collections import defaultdict, OrderedDict
-from datetime import datetime
-import argparse
 # pylint: disable=E0401
-import requests
-from fetch_currency_conversion_rates import validate_date, validate_symbols, fetch_timeseries, save_data_to_json, UnauthorizedError
+from fetch_currency_conversion_rates import (
+    fetch_timeseries,
+    save_data_to_json,
+    UnauthorizedError,
+    parse_and_validate_args
+)
 
 def save_data_to_csv(data, output_file):
     """
@@ -49,8 +50,14 @@ def save_data_to_csv(data, output_file):
     if not data:
         raise ValueError("No data provided to save.")
 
-    if not isinstance(data, list) or not all(isinstance(item, dict) for item in data):
-        raise ValueError("Data must be a list of dictionaries.")
+    if not isinstance(data, list) or not all(
+        isinstance(item, dict) and {'date', 'source', 'dest', 'rate'}.issubset(item)
+        for item in data
+    ):
+        raise ValueError(
+            "Data must be a list of dictionaries with "
+            "'date', 'source', 'dest', and 'rate' keys."
+        )
 
     # Ordered sets using dicts to preserve order
     seen_dates = OrderedDict()
@@ -89,35 +96,7 @@ def main():
     The main function that parses command-line arguments, validates them, and fetches
     the currency exchange rates from the CurrencyBeacon API.
     """
-    # Parse command-line arguments
-    parser = argparse.ArgumentParser(description="Fetch historical currency exchange rates")
-    parser.add_argument('base', help="The base currency for the rates (e.g., USD)")
-    parser.add_argument('symbols', help="Comma-separated list of target currencies (e.g., EUR,GBP)")
-    parser.add_argument(
-      'start_date',
-      help="Start date for the timeseries in YYYY-MM-DD format (e.g., 2023-01-01)"
-    )
-    parser.add_argument(
-      'end_date',
-      help="End date for the timeseries in YYYY-MM-DD format (e.g., 2023-01-31)"
-    )
-    parser.add_argument('output_file', nargs='?', help="Output JSON file path (optional)")
-
-    args = parser.parse_args()
-
-    # Validate arguments
-    if not validate_date(args.start_date):
-        print(f"Error: Invalid start date format: {args.start_date}. Expected format: YYYY-MM-DD.")
-        sys.exit(1)
-
-    if not validate_date(args.end_date):
-        print(f"Error: Invalid end date format: {args.end_date}. Expected format: YYYY-MM-DD.")
-        sys.exit(1)
-
-    if not validate_symbols(args.symbols):
-        print("Error: Invalid currency symbols: " + args.symbols)
-        print("Each symbol must be a 3-letter code separated by commas (e.g., EUR,GBP).")
-        sys.exit(1)
+    args = parse_and_validate_args()
 
     # Fetch data from CurrencyBeacon API
     try:
